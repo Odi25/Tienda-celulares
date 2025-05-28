@@ -12,11 +12,12 @@ import (
 var DB *gorm.DB
 
 func ConectarDB() {
-	host := os.Getenv("postgresql://tienda_user:8zUkdYLMhoTTLQXOf5VmIkfOaDGRRs6w@dpg-d0r8rkbuibrs73d0o40g-a/tienda_db_ussv")         // Ej: dpg-xxxxx.render.com
-	user := os.Getenv("tienda_user")         // Ej: tienda_user
-	password := os.Getenv("8zUkdYLMhoTTLQXOf5VmIkfOaDGRRs6w") // Ej: tu contraseña
-	dbname := os.Getenv("tienda_db_ussv")       // Ej: tienda_db
-	port := os.Getenv("5432")         // Ej: 5432
+	host := os.Getenv("DB_HOST")
+	user := os.Getenv("DB_USER")
+	password := os.Getenv("DB_PASSWORD")
+	dbname := os.Getenv("DB_NAME")
+	port := os.Getenv("DB_PORT")
+
 
 	dsn := fmt.Sprintf(
 		"host=%s user=%s password=%s dbname=%s port=%s sslmode=require",
