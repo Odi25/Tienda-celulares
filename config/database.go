@@ -42,7 +42,7 @@ func ConectarDB() {
 	fmt.Println("✅ Conexión exitosa a PostgreSQL")
 
 	// Ejecutar migración automática para el modelo Producto
-	err = db.AutoMigrate(&models.Producto{})
+	err = db.AutoMigrate(&models.Producto{}, &models.Usuario{}, &models.Compra{})
 	if err != nil {
 		log.Panic("❌ Error en migración de base de datos:", err)
 	}
