@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"tienda-celulares/models" // Importa tus modelos
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -39,5 +40,12 @@ func ConectarDB() {
 	// Guardar la instancia
 	DB = db
 	fmt.Println("✅ Conexión exitosa a PostgreSQL")
+
+	// Ejecutar migración automática para el modelo Producto
+	err = db.AutoMigrate(&models.Producto{})
+	if err != nil {
+		log.Panic("❌ Error en migración de base de datos:", err)
+	}
 }
+
 
