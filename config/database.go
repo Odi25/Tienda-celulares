@@ -2,6 +2,9 @@ package config
 
 import (
 	"fmt"
+	"log"
+	"os"
+
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -9,18 +12,23 @@ import (
 var DB *gorm.DB
 
 func ConectarDB() {
-	dsn := "host=localhost user=tienda_user password=Sistemas dbname=tienda_db port=5432 sslmode=disable"
-	var err error
-	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
-	if err != nil {
-		panic("❌ Error al conectar a la base de datos: " + err.Error())
-	}
-	fmt.Println("✅ Conexión exitosa a PostgreSQL")
-	var base string
-	DB.Raw("SELECT current_database()").Scan(&base)
-	fmt.Println("📌 Conectado a la base de datos:", base)
-	var user string
-	DB.Raw("SELECT current_user").Scan(&user)
-	fmt.Println("👤 Conectado como:", user)
+	host := os.Getenv("postgresql://tienda_user:8zUkdYLMhoTTLQXOf5VmIkfOaDGRRs6w@dpg-d0r8rkbuibrs73d0o40g-a/tienda_db_ussv")         // Ej: dpg-xxxxx.render.com
+	user := os.Getenv("tienda_user")         // Ej: tienda_user
+	password := os.Getenv("8zUkdYLMhoTTLQXOf5VmIkfOaDGRRs6w") // Ej: tu contraseña
+	dbname := os.Getenv("tienda_db_ussv")       // Ej: tienda_db
+	port := os.Getenv("5432")         // Ej: 5432
 
+	dsn := fmt.Sprintf(
+		"host=%s user=%s password=%s dbname=%s port=%s sslmode=require",
+		host, user, password, dbname, port,
+	)
+
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+
+	if err != nil {
+		log.Panic("❌ Error al conectar a la base de datos:", err)
+	}
+
+	DB = db
+	fmt.Println("✅ Conexión exitosa a PostgreSQL")
 }
