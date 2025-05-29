@@ -44,17 +44,34 @@ func CrearProducto(c *gin.Context) {
 func ActualizarProducto(c *gin.Context) {
 	id := c.Param("id")
 	var producto models.Producto
+
+	// Buscar el producto por ID
 	if err := config.DB.First(&producto, id).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Producto no encontrado"})
 		return
 	}
-	if err := c.ShouldBindJSON(&producto); err != nil {
+
+	var input models.Producto
+	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	config.DB.Save(&producto)
+
+	// Actualizar campos
+	producto.Nombre = input.Nombre
+	producto.Descripcion = input.Descripcion
+	producto.Precio = input.Precio
+	producto.Stock = input.Stock
+	producto.ImagenURL = input.ImagenURL
+
+	if err := config.DB.Save(&producto).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "No se pudo actualizar el producto"})
+		return
+	}
+
 	c.JSON(http.StatusOK, producto)
 }
+
 
 // DELETE /productos/:id
 func EliminarProducto(c *gin.Context) {

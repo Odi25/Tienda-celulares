@@ -39,7 +39,7 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	c.SetCookie("rol", usuario.Rol, 3600, "/", "localhost", false, true)
+	c.SetCookie("rol", usuario.Rol, 3600, "/", "", false, true)
 
 	c.JSON(http.StatusOK, gin.H{
 		"mensaje": "Login exitoso",

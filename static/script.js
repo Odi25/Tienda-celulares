@@ -8,6 +8,7 @@ async function login() {
   const res = await fetch("/api/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
+    credentials: "include", // ✅ necesario para que se guarde la cookie
     body: JSON.stringify({ correo, password })
   });
 
@@ -21,11 +22,11 @@ async function login() {
 
     if (rol === "admin") {
       document.getElementById("admin-panel").classList.remove("oculto");
-      cargarProductosAdmin(); // ✅ solo si es admin
+      cargarProductosAdmin();
     } else {
       document.getElementById("cliente-panel").classList.remove("oculto");
-      cargarProductos(); // ✅ solo si es cliente
-      cargarHistorialCompras(); // 🔄 Actualiza la tabla automáticamente
+      cargarProductos();
+      cargarHistorialCompras();
     }
 
     document.getElementById("login-msg").innerText = "";
@@ -41,27 +42,16 @@ async function cargarProductos() {
   const productos = await res.json();
 
   const contenedor = document.getElementById("productos-cards-cliente");
-  if (!contenedor) {
-    console.warn("❌ No se encontró el contenedor de tarjetas: #productos-cards-cliente");
-    return;
-  }
+  if (!contenedor) return;
 
   contenedor.innerHTML = "";
 
-  productos.forEach((p, i) => {
+  productos.forEach((p) => {
     const card = document.createElement("div");
     card.className = "col-md-4 mb-4";
 
     const imagen = p.imagen_url || "https://m.media-amazon.com/images/I/51nuxoc-u0L._AC_UF894,1000_QL80_.jpg";
-    
-    const producto = {
-    nombre: document.getElementById("nombre").value,
-    descripcion: document.getElementById("descripcion").value,
-    precio: parseFloat(document.getElementById("precio").value),
-    stock: parseInt(document.getElementById("stock").value),
-    imagen_url: document.getElementById("imagen_url").value // ✅
-    };
-    document.getElementById("imagen_url").value = p.imagen_url || "";
+
     const disponible = p.stock > 0
       ? `<button class="btn btn-primary w-100" onclick="comprarProducto(${p.id})">Comprar</button>`
       : `<span class="badge bg-secondary w-100 py-2">Agotado</span>`;
@@ -103,8 +93,8 @@ async function comprarProducto(producto_id) {
   const data = await res.json();
   if (res.ok) {
     alert("✅ Compra registrada con éxito");
-    cargarProductos();           // 🔄 Actualiza stock
-    cargarHistorialCompras();    // 🔄 Actualiza historial
+    cargarProductos();
+    cargarHistorialCompras();
   } else {
     alert("❌ Error: " + (data.error || "No se pudo completar la compra"));
   }
@@ -117,7 +107,6 @@ async function cargarHistorialCompras() {
   tbody.innerHTML = "";
 
   for (const compra of compras) {
-    // Obtener el nombre del producto
     let productoNombre = "ID: " + compra.producto_id;
     const productoRes = await fetch(`/api/productos/${compra.producto_id}`);
     if (productoRes.ok) {
@@ -135,15 +124,12 @@ async function cargarHistorialCompras() {
     `;
   }
 }
+
 async function cargarProductosAdmin() {
   const res = await fetch("/api/productos");
   const productos = await res.json();
 
-  console.log("✅ Productos recibidos:", productos); // ✅ Verifica en consola
-
   const tbody = document.querySelector("#tabla-productos tbody");
-  console.log("🔍 tbody existe:", tbody); // ✅ Verifica en consola
-
   tbody.innerHTML = "";
 
   productos.forEach(p => {
@@ -170,7 +156,7 @@ document.getElementById("form-producto").addEventListener("submit", async e => {
     descripcion: document.getElementById("descripcion").value,
     precio: parseFloat(document.getElementById("precio").value),
     stock: parseInt(document.getElementById("stock").value),
-    imagen_url: document.getElementById("imagen_url").value  // ✅ Agregado
+    imagen_url: document.getElementById("imagen_url").value
   };
 
   const url = id ? `/api/productos/${id}` : "/api/productos";
@@ -179,6 +165,7 @@ document.getElementById("form-producto").addEventListener("submit", async e => {
   await fetch(url, {
     method,
     headers: { "Content-Type": "application/json" },
+    credentials: "include", // ✅ enviar cookie para autorización
     body: JSON.stringify(producto)
   });
 
@@ -195,14 +182,16 @@ function editarProducto(id) {
       document.getElementById("descripcion").value = p.descripcion;
       document.getElementById("precio").value = p.precio;
       document.getElementById("stock").value = p.stock;
-      document.getElementById("imagen_url").value = p.imagen_url || ""; // ✅ Agregado
+      document.getElementById("imagen_url").value = p.imagen_url || "";
     });
 }
 
 function eliminarProducto(id) {
   if (confirm("¿Eliminar este producto?")) {
-    fetch(`/api/productos/${id}`, { method: "DELETE" })
-      .then(() => cargarProductosAdmin());
+    fetch(`/api/productos/${id}`, {
+      method: "DELETE",
+      credentials: "include"
+    }).then(() => cargarProductosAdmin());
   }
 }
 
@@ -238,5 +227,5 @@ async function registrar() {
 }
 
 function logout() {
-  location.reload(); // simplemente reinicia la página
+  location.reload();
 }

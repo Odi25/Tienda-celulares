@@ -5,5 +5,5 @@ type Producto struct {
 	Descripcion string  `json:"descripcion"`
 	Precio      float64 `json:"precio"`
 	Stock       int     `json:"stock"`
-	ImagenURL   string  `json:"imagen_url"` // ✅ nuevo campo
+	ImagenURL   string  `json:"imagen_url"`
 }
