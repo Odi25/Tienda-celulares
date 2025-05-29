@@ -8,7 +8,7 @@ async function login() {
   const res = await fetch("/api/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    credentials: "include", // ✅ necesario para que se guarde la cookie
+    credentials: "include",
     body: JSON.stringify({ correo, password })
   });
 
@@ -87,6 +87,7 @@ async function comprarProducto(producto_id) {
   const res = await fetch("/api/compras", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
+    credentials: "include",
     body: JSON.stringify({ usuario_id, producto_id, cantidad })
   });
 
@@ -101,14 +102,18 @@ async function comprarProducto(producto_id) {
 }
 
 async function cargarHistorialCompras() {
-  const res = await fetch(`/api/compras/${usuario_id}`);
+  const res = await fetch(`/api/compras/${usuario_id}`, {
+    credentials: "include"
+  });
   const compras = await res.json();
   const tbody = document.querySelector("#tabla-compras tbody");
   tbody.innerHTML = "";
 
   for (const compra of compras) {
     let productoNombre = "ID: " + compra.producto_id;
-    const productoRes = await fetch(`/api/productos/${compra.producto_id}`);
+    const productoRes = await fetch(`/api/productos/${compra.producto_id}`, {
+      credentials: "include"
+    });
     if (productoRes.ok) {
       const producto = await productoRes.json();
       productoNombre = producto.nombre;
@@ -126,7 +131,9 @@ async function cargarHistorialCompras() {
 }
 
 async function cargarProductosAdmin() {
-  const res = await fetch("/api/productos");
+  const res = await fetch("/api/productos", {
+    credentials: "include"
+  });
   const productos = await res.json();
 
   const tbody = document.querySelector("#tabla-productos tbody");
@@ -165,7 +172,7 @@ document.getElementById("form-producto").addEventListener("submit", async e => {
   await fetch(url, {
     method,
     headers: { "Content-Type": "application/json" },
-    credentials: "include", // ✅ enviar cookie para autorización
+    credentials: "include",
     body: JSON.stringify(producto)
   });
 
@@ -174,7 +181,9 @@ document.getElementById("form-producto").addEventListener("submit", async e => {
 });
 
 function editarProducto(id) {
-  fetch(`/api/productos/${id}`)
+  fetch(`/api/productos/${id}`, {
+    credentials: "include"
+  })
     .then(res => res.json())
     .then(p => {
       document.getElementById("producto-id").value = p.id;
