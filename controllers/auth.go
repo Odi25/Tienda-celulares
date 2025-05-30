@@ -65,6 +65,11 @@ func Logout(c *gin.Context) {
     if os.Getenv("RENDER") == "true" {
         dominio = "tienda-celulares.onrender.com"
     }
+
+    // Borrar cookies
+    c.SetCookie("rol", "", -1, "/", dominio, true, true)
+    c.SetCookie("usuario_id", "", -1, "/", dominio, true, true)
+
     c.JSON(http.StatusOK, gin.H{"mensaje": "Sesión cerrada correctamente"})
 }
 
