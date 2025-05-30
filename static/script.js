@@ -1,6 +1,38 @@
 let usuario_id = null;
 let rol = null;
 
+async function verificarSesion() {
+  const res = await fetch("/api/sesion", {
+    credentials: "include"
+  });
+
+  const data = await res.json();
+
+  if (data.logueado) {
+    rol = data.rol;
+    usuario_id = data.id;
+
+    document.getElementById("login-register-panel").style.display = "none";
+
+    if (rol === "admin") {
+      document.getElementById("admin-panel").classList.remove("oculto");
+      cargarProductosAdmin();
+    } else {
+      document.getElementById("cliente-panel").classList.remove("oculto");
+      cargarProductos();
+      cargarHistorialCompras();
+    }
+
+    document.getElementById("logout-btn").classList.remove("oculto");
+  } else {
+    // No logueado → mostrar login
+    document.getElementById("login-register-panel").style.display = "block";
+    document.getElementById("admin-panel").classList.add("oculto");
+    document.getElementById("cliente-panel").classList.add("oculto");
+    document.getElementById("logout-btn").classList.add("oculto");
+  }
+}
+
 async function login() {
   const correo = document.getElementById("correo").value;
   const password = document.getElementById("password").value;
@@ -238,3 +270,5 @@ async function registrar() {
 function logout() {
   location.reload();
 }
+
+document.addEventListener("DOMContentLoaded", verificarSesion);

@@ -15,7 +15,7 @@ func ConfigurarRutas(r *gin.Engine) {
 		api.POST("/login", controllers.Login)
 		api.POST("/registro", controllers.Registro)
 		api.GET("/debug/usuarios", controllers.DebugUsuarios)
-		
+		api.POST("/logout", controllers.Logout)
 
 		// Rutas protegidas
 		api.POST("/productos", middleware.SoloAdmin(), controllers.CrearProducto)
